@@ -1,0 +1,28 @@
+version: 0.2
+
+env:
+  secrets-manager:
+    LOGIN: local/sonar:sonartoken
+    HOST: local/sonar:HOST
+    Organization: local/sonar:Organization
+    Project: local/sonar:Project
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+  pre_build:
+    commands:
+      - npm install
+  build:
+    commands:
+      - npm run build
+      - sonar-scanner \
+          -Dsonar.login="$LOGIN" \
+          -Dsonar.host.url="$HOST" \
+          -Dsonar.projectKey="$Project" \
+          -Dsonar.organization="$Organization"
+      - sleep 5
+      - curl "https://sonarcloud.io/api/qualitygates/project_status?projectKey=$Project" > result.json
+      - cat result.json
+      - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ]; then exit 1; fi
