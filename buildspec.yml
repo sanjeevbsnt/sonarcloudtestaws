@@ -11,24 +11,26 @@ phases:
       nodejs: '20'
   pre_build:
     commands:
-      - npm install -g npm@latest
-      - npm install -g create-react-app
-      - create-react-app my-react-app
-      - cd my-react-app
+      - mkdir /downloads/sonarqube -p
+      - cd /downloads/sonarqube
+      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
+      - unzip sonar-scanner-cli-4.2.0.1873-linux.zip
+      - mv sonar-scanner-4.2.0.1873-linux /opt/sonar-scanner
+      - export PATH=$PATH:/opt/sonar-scanner/bin
+      - cd $CODEBUILD_SRC_DIR/my-react-app
       - npm install
-      - wget http://www-eu.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz
-      - tar xzf apache-maven-3.5.4-bin.tar.gz
-      - ln -s apache-maven-3.5.4 maven
-      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.3.0.1492-linux.zip
-      - unzip ./sonar-scanner-cli-3.3.0.1492-linux.zip
-      - export PATH=$PATH:/sonar-scanner-3.3.0.1492-linux/bin/
   build:
     commands:
       - npm test
       - npm run build
-      - mvn sonar:sonar -Dsonar.login=$LOGIN -Dsonar.host.url=$HOST -Dsonar.projectKey=$Project -Dsonar.organization=$Organization
-      - sleep 5
-      - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$Project >result.json
-      - cat result.json
-      - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
+      - sonar-scanner \
+          -Dsonar.login=$LOGIN \
+          -Dsonar.host.url=$HOST \
+          -Dsonar.projectKey=$Project \
+          -Dsonar.organization=$Organization \
+          -Dsonar.sources=. \
+          -Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/*.spec.js \
+          -Dsonar.tests=. \
+          -Dsonar.test.inclusions=**/*.test.js,**/*.spec.js
+
 
