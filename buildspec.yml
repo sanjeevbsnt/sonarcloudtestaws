@@ -1,18 +1,16 @@
 version: 0.2
 env:
   secrets-manager:
-    LOGIN: local/sonar:sonartoken
-    HOST: local/sonar:HOST
-    Organization: local/sonar:Organization
-    Project: local/sonar:Project
+    LOGIN: test/sonar:sonartoken
+    HOST: test/sonar:HOST
+    Organization: test/sonar:Organization
+    Project: test/sonar:Project
 phases:
   install:
     runtime-versions:
       nodejs: '20'
   pre_build:
     commands:
-      - apt-get update
-      - apt-get install -y jq
       - npm install -g npm@latest
       - npm install -g create-react-app
       - create-react-app my-react-app
@@ -33,3 +31,4 @@ phases:
       - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$Project >result.json
       - cat result.json
       - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
+
