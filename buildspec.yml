@@ -1,28 +1,23 @@
 version: 0.2
+
 env:
   secrets-manager:
     LOGIN: local/sonar:sonartoken
     HOST: local/sonar:HOST
     Organization: local/sonar:Organization
     Project: local/sonar:Project
+
 phases:
   install:
     runtime-versions:
       nodejs: '20'
-  pre_build:
     commands:
-      - mkdir -p /downloads/sonarqube
-      - cd /downloads/sonarqube
-      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
-      - unzip sonar-scanner-cli-4.2.0.1873-linux.zip
-      - mv sonar-scanner-4.2.0.1873-linux /opt/sonar-scanner
-      - export PATH=$PATH:/opt/sonar-scanner/bin
+      - npm install  # Installs dependencies (including sonarqube-scanner)
+
   build:
     commands:
-      - cd /downloads/sonarqube  # Adjust the path to your React app directory
-      - npm install   # Install npm dependencies
-      - npm test   # Run tests if applicable
-      - npm run build   # Build your React app
+      - npm test
+      - npm run build  # Assuming your build command is 'npm run build'
       - sonar-scanner \
           -Dsonar.login=$LOGIN \
           -Dsonar.host.url=$HOST \
@@ -32,6 +27,8 @@ phases:
           -Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/*.spec.js \
           -Dsonar.tests=. \
           -Dsonar.test.inclusions=**/*.test.js,**/*.spec.js
+
+
 
 
 
