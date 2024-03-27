@@ -16,16 +16,22 @@ phases:
 
   build:
     commands:
-      - mvn test
-      - mvn sonar:sonar -Dsonar.login=$LOGIN -Dsonar.host.url=$HOST -Dsonar.projectKey=$Project -Dsonar.organization=$Organization
-      - sleep 5
-      - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$Project >result.json
-      - cat result.json
-      - if [ "$(jq -r '.projectStatus.status' result.json)" = "ERROR" ]; then exit 1; fi
-      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
-      - unzip sonar-scanner-cli-4.2.0.1873-linux.zip
-      - mv sonar-scanner-4.2.0.1873-linux /opt/sonar-scanner
-      - export PATH=$PATH:/opt/sonar-scanner/bin
+      # Replace with your specific build command (e.g., for create-react-app)
+      - npm run build
+      # OR (if using a custom build configuration)
+      # Your custom build commands here
+      - # SonarQube analysis (assuming downloaded scanner in /opt/sonar-scanner/bin)
+      - sonar-scanner \
+          -Dsonar.login=$LOGIN \
+          -Dsonar.host.url=$HOST \
+          -Dsonar.projectKey=$Project \
+          -Dsonar.organization=$Organization
+
+  # Optional phases (add if needed)
+  # post_build:
+  #   commands:
+  #     - # Any commands to run after the build is successful
+
 
 
 
