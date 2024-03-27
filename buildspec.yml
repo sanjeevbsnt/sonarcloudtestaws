@@ -17,7 +17,7 @@ phases:
       - unzip sonar-scanner-cli-4.2.0.1873-linux.zip
       - mv sonar-scanner-4.2.0.1873-linux /opt/sonar-scanner
       - export PATH=$PATH:/opt/sonar-scanner/bin
-      - cd sonarcloudtestaws/Reactapp   # Navigate to the directory of your React app
+      - cd C:/Users/sanjeev.basnet_genes/Desktop/sonarcloudtestaws/Reactapp  # Navigate to the directory of your React app
       - npm install                     # Run npm install in the directory containing package.json
   build:
     commands:
