@@ -19,7 +19,7 @@ phases:
       - export PATH=$PATH:/opt/sonar-scanner/bin
   build:
     commands:
-      - cd src  # Adjust the path to your React app directory
+      - cd /downloads/sonarqube  # Adjust the path to your React app directory
       - npm install   # Install npm dependencies
       - npm test   # Run tests if applicable
       - npm run build   # Build your React app
