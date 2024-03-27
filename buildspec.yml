@@ -17,7 +17,8 @@ phases:
       - unzip sonar-scanner-cli-4.2.0.1873-linux.zip
       - mv sonar-scanner-4.2.0.1873-linux /opt/sonar-scanner
       - export PATH=$PATH:/opt/sonar-scanner/bin
-      - npm install
+      - cd sonarcloudtestaws/Reactapp   # Navigate to the directory of your React app
+      - npm install                     # Run npm install in the directory containing package.json
   build:
     commands:
       - npm test
@@ -31,6 +32,7 @@ phases:
           -Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/*.spec.js \
           -Dsonar.tests=. \
           -Dsonar.test.inclusions=**/*.test.js,**/*.spec.js
+
 
 
 
