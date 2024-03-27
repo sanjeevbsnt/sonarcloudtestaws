@@ -36,6 +36,6 @@
     ]
   },
   "devDependencies": {
-    "sonarqube-scanner": "^3.3.0"
+    "sonarqube-scanner": "^4.2.0"
   }
 }
