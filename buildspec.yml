@@ -16,17 +16,17 @@ phases:
 
   build:
     commands:
-      - npm test
-      - npm run build  # Assuming your build command is 'npm run build'
-      - sonar-scanner \
-          -Dsonar.login=$LOGIN \
-          -Dsonar.host.url=$HOST \
-          -Dsonar.projectKey=$Project \
-          -Dsonar.organization=$Organization \
-          -Dsonar.sources=. \
-          -Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/*.spec.js \
-          -Dsonar.tests=. \
-          -Dsonar.test.inclusions=**/*.test.js,**/*.spec.js
+      - mvn test
+      - mvn sonar:sonar -Dsonar.login=$LOGIN -Dsonar.host.url=$HOST -Dsonar.projectKey=$Project -Dsonar.organization=$Organization
+      - sleep 5
+      - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$Project >result.json
+      - cat result.json
+      - if [ "$(jq -r '.projectStatus.status' result.json)" = "ERROR" ]; then exit 1; fi
+      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
+      - unzip sonar-scanner-cli-4.2.0.1873-linux.zip
+      - mv sonar-scanner-4.2.0.1873-linux /opt/sonar-scanner
+      - export PATH=$PATH:/opt/sonar-scanner/bin
+
 
 
 
