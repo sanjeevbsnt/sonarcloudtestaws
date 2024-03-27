@@ -5,6 +5,7 @@ env:
     HOST: local/sonar:HOST
     Organization: local/sonar:Organization
     Project: local/sonar:Project
+
 phases:
   install:
     runtime-versions:
@@ -13,9 +14,9 @@ phases:
     commands:
       - apt-get update
       - apt-get install -y jq
-      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.1.3023-linux.zip
-      - unzip sonar-scanner-cli-4.8.1.3023-linux.zip
-      - export PATH=$PATH:/Users/sanjeev.basnet_genes/Downloads/sonar-scanner-cli-4.8.1.3023/sonar-scanner-cli-4.8.1.3023/bin/
+      - curl -sL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/latest | tar -zxvf -  # Download latest version
+      - export PATH=$PATH:/opt/sonar/scanner/bin  # Assuming scanner installed in /opt/sonar
+
   build:
     commands:
       - npm install
@@ -26,4 +27,3 @@ phases:
       - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$Project > result.json
       - cat result.json
       - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
-
