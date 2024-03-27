@@ -11,18 +11,18 @@ phases:
       nodejs: '20'
   pre_build:
     commands:
-      - mkdir /downloads/sonarqube -p
+      - mkdir -p /downloads/sonarqube
       - cd /downloads/sonarqube
       - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
       - unzip sonar-scanner-cli-4.2.0.1873-linux.zip
       - mv sonar-scanner-4.2.0.1873-linux /opt/sonar-scanner
       - export PATH=$PATH:/opt/sonar-scanner/bin
-      - cd C:/Users/sanjeev.basnet_genes/Desktop/sonarcloudtestaws/Reactapp  # Navigate to the directory of your React app
-      - npm install                     # Run npm install in the directory containing package.json
   build:
     commands:
-      - npm test
-      - npm run build
+      - cd /path/to/your/react/app   # Adjust the path to your React app directory
+      - npm install   # Install npm dependencies
+      - npm test   # Run tests if applicable
+      - npm run build   # Build your React app
       - sonar-scanner \
           -Dsonar.login=$LOGIN \
           -Dsonar.host.url=$HOST \
@@ -32,6 +32,7 @@ phases:
           -Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/*.spec.js \
           -Dsonar.tests=. \
           -Dsonar.test.inclusions=**/*.test.js,**/*.spec.js
+
 
 
 
