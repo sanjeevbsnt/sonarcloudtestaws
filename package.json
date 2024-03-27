@@ -36,6 +36,8 @@
     ]
   },
   "devDependencies": {
-    "sonarqube-scanner": "^3.3.0"
+    "sonarqube-scanner": "^3.3.0",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.0"
   }
+  
 }
