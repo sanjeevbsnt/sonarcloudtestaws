@@ -14,7 +14,8 @@ phases:
     commands:
       - apt-get update
       - apt-get install -y jq
-      - curl -sL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/latest | tar -zxvf -  # Download latest version
+      # Retry downloading SonarScanner with a maximum of 3 attempts
+      - for i in {1,2,3}; do curl -sLf https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/latest | tar -zxvf - && break; done
       - export PATH=$PATH:/opt/sonar/scanner/bin  # Assuming scanner installed in /opt/sonar
 
   build:
@@ -27,3 +28,4 @@ phases:
       - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$Project > result.json
       - cat result.json
       - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
+      
