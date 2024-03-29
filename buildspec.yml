@@ -11,23 +11,24 @@ phases:
       nodejs: 20
   pre_build:
     commands:
-    - apt-get update
-    - apt-get install -y jq
-    - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
-    - unzip sonar-scanner-cli-4.8.0.2856-linux.zip
-    - sudo mkdir -p /opt/sonar-scanner
-    - ls  # List the contents of the current directory
-    - mv sonar-scanner-4.8.0.2856-linux /opt/sonar-scanner/
+      - apt-get update
+      - apt-get install -y jq
+      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
+      - unzip sonar-scanner-cli-4.8.0.2856-linux.zip
+      - sudo mkdir -p /opt/sonar-scanner
+      - mv sonar-scanner-4.8.0.2856-linux /opt/sonar-scanner/sonar-scanner
+      - chmod +x /opt/sonar-scanner/sonar-scanner/bin/sonar-scanner
+      - export PATH=$PATH:/opt/sonar-scanner/sonar-scanner/bin
   build:
     commands:
       - npm install
       - npm run build
-      - export PATH=$PATH:/opt/sonar-scanner/bin
       - sonar-scanner -Dsonar.login=$LOGIN -Dsonar.host.url=$HOST -Dsonar.projectKey=$Project -Dsonar.organization=$Organization
       - sleep 5
       - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$Project > result.json
       - cat result.json
       - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ]; then exit 1; fi
+
 
 
 
