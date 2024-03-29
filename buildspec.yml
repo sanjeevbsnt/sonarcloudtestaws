@@ -1,36 +1,31 @@
 version: 0.2
-
 env:
   secrets-manager:
     LOGIN: local/sonar:sonartoken
     HOST: local/sonar:HOST
     Organization: local/sonar:Organization
     Project: local/sonar:Project
-
 phases:
   install:
     runtime-versions:
-      nodejs: '20'
+      nodejs: 20
+  pre_build:
     commands:
-      - npm install  # Installs dependencies (including sonarqube-scanner)
-
+      - apt-get update
+      - apt-get install -y jq
+      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.1.3023-linux.zip
+      - unzip sonar-scanner-cli-4.8.1.3023-linux.zip
+      - export PATH=$PATH:/sonar-scanner-4.8.1.3023-linux/bin/
   build:
     commands:
-      # Replace with your specific build command (e.g., for create-react-app)
+      - npm install
       - npm run build
-      # OR (if using a custom build configuration)
-      # Your custom build commands here
-      - # SonarQube analysis (assuming downloaded scanner in /opt/sonar-scanner/bin)
-      - sonar-scanner \
-          -Dsonar.login=$LOGIN \
-          -Dsonar.host.url=$HOST \
-          -Dsonar.projectKey=$Project \
-          -Dsonar.organization=$Organization
+      - sonar-scanner -Dsonar.login=$LOGIN -Dsonar.host.url=$HOST -Dsonar.projectKey=$Project -Dsonar.organization=$Organization
+      - sleep 5
+      - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$Project > result.json
+      - cat result.json
+      - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ]; then exit 1; fi
 
-  # Optional phases (add if needed)
-  # post_build:
-  #   commands:
-  #     - # Any commands to run after the build is successful
 
 
 
