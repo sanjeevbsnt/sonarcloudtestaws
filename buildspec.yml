@@ -8,7 +8,7 @@ env:
 phases:
   install:  # No changes needed here if you already have an install phase
     runtime-versions:  # This section specifies the runtime versions
-      nodejs: 20
+      nodejs: 12
       java: corretto11  # This line adds Java 11 runtime
   pre_build:  # Rest of your pre-build commands remain here
     commands:
