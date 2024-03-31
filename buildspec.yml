@@ -18,7 +18,8 @@ phases:
       - sudo unzip sonarqube-10.0.0.68432.zip -d /opt
       - sudo mv /opt/sonarqube-10.0.0.68432 /opt/sonarqube
       - export PATH=$PATH:/opt/sonarqube/bin
-      - sonar-scanner -v
+      - ls -l /opt/sonarqube/bin/sonarqube  # Check permissions
+      - /opt/sonarqube/bin/sonarqube -v 
   build:
     commands:
       - npm install
