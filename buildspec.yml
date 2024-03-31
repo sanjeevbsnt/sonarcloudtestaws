@@ -6,10 +6,11 @@ env:
     Organization: local/sonar:Organization
     Project: local/sonar:Project
 phases:
-  install:
-    runtime-versions:
+  install:  # No changes needed here if you already have an install phase
+    runtime-versions:  # This section specifies the runtime versions
       nodejs: 20
-  pre_build:
+      java: corretto11  # This line adds Java 11 runtime
+  pre_build:  # Rest of your pre-build commands remain here
     commands:
       - apt-get update
       - apt-get install -y jq
@@ -19,7 +20,7 @@ phases:
       - mv sonar-scanner-4.8.0.2856-linux /opt/sonar-scanner/sonar-scanner
       - chmod +x /opt/sonar-scanner/sonar-scanner/bin/sonar-scanner
       - export PATH=$PATH:/opt/sonar-scanner/sonar-scanner/bin
-  build:
+  build:  # Rest of your build commands remain here
     commands:
       - npm install
       - npm run build
@@ -28,6 +29,7 @@ phases:
       - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$Project > result.json
       - cat result.json
       - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ]; then exit 1; fi
+
 
 
 
