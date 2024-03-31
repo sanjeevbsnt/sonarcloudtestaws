@@ -6,21 +6,19 @@ env:
     Organization: local/sonar:Organization
     Project: local/sonar:Project
 phases:
-  install:  # No changes needed here if you already have an install phase
-    runtime-versions:  # This section specifies the runtime versions
+  install:
+    runtime-versions:
       nodejs: 12
-      java: corretto11  # This line adds Java 11 runtime
-  pre_build:  # Rest of your pre-build commands remain here
+      java: corretto11
+  pre_build:
     commands:
-      - yum update -y  # Update package lists
+      - yum update -y
       - yum install -y jq unzip
-      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
-      - unzip sonar-scanner-cli-4.8.0.2856-linux.zip
-      - sudo mkdir -p /opt/sonar-scanner
-      - mv sonar-scanner-4.8.0.2856-linux /opt/sonar-scanner/sonar-scanner
-      - chmod +x /opt/sonar-scanner/sonar-scanner/bin/sonar-scanner
-      - export PATH=$PATH:/opt/sonar-scanner/sonar-scanner/bin
-  build:  # Rest of your build commands remain here
+      - sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.0.0.68432.zip
+      - sudo unzip sonarqube-10.0.0.68432.zip -d /opt
+      - sudo mv /opt/sonarqube-10.0.0.68432 /opt/sonarqube
+      - export PATH=$PATH:/opt/sonarqube/bin
+  build:
     commands:
       - npm install
       - npm run build
@@ -28,7 +26,8 @@ phases:
       - sleep 5
       - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$Project > result.json
       - cat result.json
-      - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ]; then exit 1; fi
+      - if [ $(jq -r '.projectStatus.status' result.json) = "ERROR" ]; then exit 1; fi
+
 
 
 
