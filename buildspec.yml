@@ -3,60 +3,23 @@ version: 0.2
 phases:
   install:
     commands:
-      - echo "Installing npm..."
-      - curl -sL https://deb.nodesource.com/setup_18.x | bash -s -- -o /etc/apt/sources.list.d/nodesource.list
-      - apt-get update
-      - apt-get install -y nodejs
-      - echo "Downloading SonarScanner..."
-      - SONAR_SCANNER_VERSION=4.7.0.2747  # Set desired version here
-      - curl --create-dirs -sSLo $HOME/.sonar/sonar-scanner.zip \
-        "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip"
-      - unzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
-      - echo "Adding SonarScanner to PATH..."
-      - export PATH=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux/bin:$PATH
-
+      - sudo apt-get install -y zip
+      - sudo apt-get install -y unzip
+      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
+      - unzip sonar-scanner-cli-4.6.2.2472-linux.zip
+      - export PATH=$PATH:$PWD/sonar-scanner-4.6.2.2472-linux/bin
+      - cd path/to/your/react/project 
+      - npm install
+  pre_build:
+    commands:
+      - # Any pre-build commands needed, like additional configurations or environment setups
   build:
     commands:
-      - echo "Installing project dependencies..."
-      # Assuming the project files are already in the working directory (no 'cd')
-      - npm install
-
+      - npm run build
   post_build:
     commands:
-      - echo "Retrieving SonarQube token..."
-      - SONARQUBE_TOKEN=$(aws secretsmanager get-secret-value --secret-id local/sonar --query SecretString --output text)
-      - echo "Performing SonarQube analysis..."
-      sonar-scanner \
-          -Dsonar.projectKey=sampletestproject \
-          # Assuming the project files are already in the working directory (no 'cd')
-          -Dsonar.sources=. \
-          -Dsonar.host.url=http://18.139.177.99:9000 \
-          -Dsonar.login=$SONARQUBE_TOKEN
+      - sonar-scanner -Dsonar.projectKey=sampletestproject1 -Dsonar.sources=. -Dsonar.host.url=http://18.139.177.99:9000 -Dsonar.login=sqp_bfca4c4e2ec603cf21e11d052369dd92f03ea8f5 
 
-**Explanation:**
-
-- **Version:** The `version` is set to `0.2`.
-- **Phases:**
-  - **install:** This phase installs Node.js, downloads the desired SonarScanner version using `curl`, extracts it, and updates the `PATH` environment variable.
-  - **build:** This phase installs project dependencies using `npm install`. (Modify the command if you use a different package manager.)
-  - **post_build:**
-    - This phase retrieves the SonarQube token securely from AWS Secrets Manager using the `aws secretsmanager` command.
-    - It stores the retrieved token in the `SONARQUBE_TOKEN` environment variable.
-    - Finally, it runs the `sonar-scanner` command with your project key, source code location, SonarQube server URL, and authentication using the retrieved token.
-
-**Security Considerations:**
-
-- This buildspec avoids storing the SonarQube token directly within the CodeBuild project for improved security.
-- Consider using environment variables to store the retrieved token after retrieval within the `post_build` phase to minimize its potential exposure in build logs.
-
-**Additional Notes:**
-
-- Replace `sampletestproject` with your actual SonarQube project key.
-- Replace `SONAR_SCANNER_VERSION` with the desired version if needed.
-- Adjust the `http://18.139.177.99:9000` URL to match your SonarQube server's IP address and port.
-- Ensure the IAM role associated with your CodeBuild project has the necessary permissions (refer to previous discussions).
-
-This comprehensive buildspec provides a secure and streamlined approach for integrating your React project with SonarQube analysis within your AWS CodePipeline for enhanced code quality monitoring.
 
 
 
