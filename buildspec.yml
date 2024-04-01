@@ -2,21 +2,28 @@ version: 0.2
 
 phases:
   install:
+    runtime-versions:
+      java: openjdk-17
     commands:
-      - sudo apt-get install -y zip
-      - sudo apt-get install -y unzip
-      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
-      - unzip sonar-scanner-cli-4.6.2.2472-linux.zip
-      - export PATH=$PATH:$PWD/sonar-scanner-4.6.2.2472-linux/bin
+      - sudo apt-get update
+      - sudo apt-get install -y zip unzip
+      - sudo apt-get install -y default-jre
+      - sudo apt-get install -y default-jdk
+      - sudo apt-get install -y wget
+      - sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.0.0.68432.zip
+      - sudo unzip sonarqube-10.0.0.68432.zip -d /opt
+      - sudo mv /opt/sonarqube-10.0.0.68432 /opt/sonarqube
   pre_build:
     commands:
+      - cd /codebuild/output/src
       - npm install
   build:
     commands:
       - npm run build
   post_build:
     commands:
-      - sonar-scanner -Dsonar.projectKey=sampletestproject1 -Dsonar.sources=. -Dsonar.host.url=http://18.139.177.99:9000 -Dsonar.login=sqp_bfca4c4e2ec603cf21e11d052369dd92f03ea8f5
+      - sonar-scanner -Dsonar.projectKey=sampletestproject1 -Dsonar.sources=. -Dsonar.host.url=http://18.139.177.99:9000 -Dsonar.login=sqp_bfca4c4e2ec603cf21e11d052369dd92f03ea8f5 
+
 
 
 
