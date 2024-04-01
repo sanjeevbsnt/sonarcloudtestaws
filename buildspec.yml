@@ -1,34 +1,37 @@
 version: 0.2
-env:
-  secrets-manager:
-    LOGIN: local/sonar:sonartoken
-    HOST: local/sonar:HOST
-    Organization: local/sonar:Organization
-    Project: local/sonar:Project
+
 phases:
   install:
-    runtime-versions:
-      nodejs: 12
-      java: corretto11
-  pre_build:
     commands:
-      - yum update -y
-      - yum install -y jq unzip
-      - sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.0.0.68432.zip
-      - sudo unzip sonarqube-10.0.0.68432.zip -d /opt
-      - sudo mv /opt/sonarqube-10.0.0.68432 /opt/sonarqube
-      - export PATH=$PATH:/opt/sonarqube/bin
-      - ls -l /opt/sonarqube/bin/sonarqube  # Check permissions
-      - /opt/sonarqube/bin/sonarqube -v 
+      - echo "Installing npm..."
+      - curl -sL https://deb.nodesource.com/setup_18.x | bash -s -- -o /etc/apt/sources.list.d/nodesource.list
+      - apt-get update
+      - apt-get install -y nodejs
+      - echo "Downloading SonarScanner..."
+      - SONAR_SCANNER_VERSION=4.7.0.2747  # Set desired version here
+      - curl --create-dirs -sSLo $HOME/.sonar/sonar-scanner.zip \
+        "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip"
+      - unzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
+      - echo "Adding SonarScanner to PATH..."
+      - export PATH=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux/bin:$PATH
+
   build:
     commands:
+      - echo "Installing project dependencies..."
+      # Assuming the project files are already in the working directory (no 'cd')
       - npm install
-      - npm run build
-      - sonar-scanner -Dsonar.login=$LOGIN -Dsonar.host.url=$HOST -Dsonar.projectKey=$Project -Dsonar.organization=$Organization
-      - sleep 5
-      - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$Project > result.json
-      - cat result.json
-      - if [ $(jq -r '.projectStatus.status' result.json) = "ERROR" ]; then exit 1; fi
+
+  post_build:
+    commands:
+      - echo "Retrieving SonarQube token..."
+      - SONARQUBE_TOKEN=$(aws secretsmanager get-secret-value --secret-id local/sonar --query SecretString --output text)
+      - echo "Performing SonarQube analysis..."
+      sonar-scanner \
+          -Dsonar.projectKey=sampletestproject \
+          # Assuming the project files are already in the working directory (no 'cd')
+          -Dsonar.sources=. \
+          -Dsonar.host.url=http://18.139.177.99:9000 \
+          -Dsonar.login=$SONARQUBE_TOKEN
 
 
 
