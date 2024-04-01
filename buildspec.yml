@@ -8,17 +8,16 @@ phases:
       - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
       - unzip sonar-scanner-cli-4.6.2.2472-linux.zip
       - export PATH=$PATH:$PWD/sonar-scanner-4.6.2.2472-linux/bin
-      - cd path/to/your/react/project 
-      - npm install
   pre_build:
     commands:
-      - # Any pre-build commands needed, like additional configurations or environment setups
+      - npm install
   build:
     commands:
       - npm run build
   post_build:
     commands:
-      - sonar-scanner -Dsonar.projectKey=sampletestproject1 -Dsonar.sources=. -Dsonar.host.url=http://18.139.177.99:9000 -Dsonar.login=sqp_bfca4c4e2ec603cf21e11d052369dd92f03ea8f5 
+      - sonar-scanner -Dsonar.projectKey=sampletestproject1 -Dsonar.sources=. -Dsonar.host.url=http://18.139.177.99:9000 -Dsonar.login=sqp_bfca4c4e2ec603cf21e11d052369dd92f03ea8f5
+
 
 
 
