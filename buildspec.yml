@@ -7,11 +7,11 @@ phases:
         commands:
             - pip3 install -q awscli --upgrade --user
             - pip3 install boto3
-            - yum -q install -y jq
-            - sudo apt install zip -y  # Install zip utility
-            - sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.0.0.68432.zip  # Download SonarQube
-            - sudo unzip sonarqube-10.0.0.68432.zip -d /opt/  # Unzip SonarQube
-            - sudo mv /opt/sonarqube-10.0.0.68432 /opt/sonarqube  # Move SonarQube directory to /opt/sonarqube
+            - yum -q install -y zip
+            - yum -q install -y jq # Install zip utility
+            - wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.0.0.68432.zip  # Download SonarQube
+            - unzip sonarqube-10.0.0.68432.zip -d /opt/  # Unzip SonarQube
+            - mv /opt/sonarqube-10.0.0.68432 /opt/sonarqube  # Move SonarQube directory to /opt/sonarqube
     pre_build:
         commands:
             - echo Start code scan...
@@ -20,7 +20,7 @@ phases:
             - "curl -s -u $SONAR_QUBE_KEY: $SONAR_QUBE_URL/api/qualitygates/project_status?projectKey=$SONAR_QUBE_PROJECT> /tmp/result.json"
             - if [ "$(jq -r '.projectStatus.status' /tmp/result.json)" = "ERROR" ]; then CODEBUILD_BUILD_SUCCEEDING=0; fi
             - echo Code scan completed on $(date)
-            - if [ "$CODEBUILD_BUILD_SUCCEEDING" -eq 0 ]; then exit 1; fi
+            - if [ "$CODEBUILD_BUILD_SUCCEEDING" -eq 0 ]; then exit 1; fi 
 
 
 
