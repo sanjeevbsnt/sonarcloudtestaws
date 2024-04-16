@@ -3,25 +3,25 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 14
+      nodejs: 20
     commands:
       - npm install
+
   build:
     commands:
       - npm run build
       - npm test -- --reporters=default --reporters=jest-junit
-      # Run tests and generate reports (adjust the command according to your testing framework)
+
   post_build:
     commands:
-      - mkdir -p reports  # Create a directory to store reports
-      - mv junit.xml reports/  # Move the generated report to the reports directory
+      - mkdir -p reports
+      - mv junit.xml reports/
+
 artifacts:
   files:
     - '**/*'
-  # You can also include reports in the artifacts if needed
-  # files:
-  #   - '**/*'
-  #   - 'reports/*'
+    - 'reports/*'
+
 
 
 
