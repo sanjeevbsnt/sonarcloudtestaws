@@ -1,26 +1,28 @@
 version: 0.2
-
+env:
+  variables:
+    SONAR_SCANNER_VERSION: 4.7.0.2747
+    SONAR_SCANNER_HOME:
+    SONAR_TOKEN: sqp_bcc76d90e4be8049408099afa4423d6bbba8715c
+    PROJECT_KEY: testsonarqube
 phases:
   install:
     runtime-versions:
-      nodejs: 20
+      java: corretto17
     commands:
-      - npm install
-
+      - apt-get update && apt-get install -y jq
+      - curl --create-dirs -sSLo $HOME/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip
+      - unzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
+      - export PATH=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux/bin:$PATH
+      - export SONAR_SCANNER_OPTS="-server"
   build:
     commands:
-      - npm run build
-      - npm test -- --reporters=default --reporters=jest-junit
+      - sonar-scanner -Dsonar.projectKey=$PROJECT_KEY -Dsonar.sources=. -Dsonar.host.url=http://18.139.177.99:9000 
+      - sleep 5
+      - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$PROJECT_KEY > result.json
+      - cat result.json
+      - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi 
 
-  post_build:
-    commands:
-      - mkdir -p reports
-      - mv junit.xml reports/
-
-artifacts:
-  files:
-    - '**/*'
-    - 'reports/*'
 
 
 
